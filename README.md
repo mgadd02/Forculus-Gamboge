@@ -5,17 +5,19 @@
 
 ## Project Description  
 The SLARM system integrates door access control with environmental monitoring to provide a secure, data-driven solution for room management. A network of IoT boards handles user authentication, sensor data collection, local and remote dashboards, and actuators (LED or servo) to lock or unlock doors. Australian English spelling and punctuation are used throughout.
+INTENDED FOR TEMPERATURE SENSITIVE ENVIRONMENTS SUCH AS COLD ROOMS FOR FOOD STORAGE, OR SERVER/COMPUTE ROOMS.
 
 ## Hardware Components  
 - **Primary Door Node (DiscoL475 IoT Discovery Board)**  
-  - Keypad for PIN entry  
-  - NFC reader/writer and NFC card for authentication  
+  - Keypad for PIN entry
+  - Hall effect sensor for door presence (IF REQUIRED)
+  - NFC reader/writer and NFC card for authentication (IF REQUIRED)
   - Ultrasonic sensor for door‐presence detection  
-  - Actuator: LED indicator (base node) or servo motor (door node)  
+  - Actuator: LED indicator (base node) or servo motor (door node, IF REQUIRED)  
 
 - **Base Node (nRF52840 DK)**  
-  - Central BLE gateway for Thingy:52 and DiscoL475  
-  - Serial link to Raspberry Pi 5  
+  - Central BLE gateway for Thingy:52 and DiscoL475 and the M5 Core2 Admin Display
+  - Serial link to Raspberry Pi 5 running Zephyr Shell Commands ETC for info transfer and logging.
   - Status LEDs for locked/unlocked and temperature warnings  
 
 - **Admin Dashboard Display (M5Core 2)**  
@@ -26,29 +28,30 @@ The SLARM system integrates door access control with environmental monitoring to
   - RGB LED to reflect air-quality status  
   - BLE transmitter to Base Node  
 
-- **Facial Recognition Node (Raspberry Pi 5 4 GB + Arducam ESP32-CAM)**  
+- **Facial Recognition Node (Raspberry Pi 5 4 GB + Arducam / ESP32-CAM)**  
   - Convolutional Neural Network (CNN) for face recognition  
   - Serial communication to Base Node  
 
 - **Development & Communication**  
-  - MQTT broker (online dashboard & data logging)  
-  - Optional blockchain ledger for immutable access logs  
+  - MQTT broker (online dashboard & data logging)
+  - Graphana Dashboard, InfluxDB, online hosted, using PC/RPI-5 for logging and remote monitoring.
+  - Optional blockchain ledger for immutable access logs (IF REQUIRED) 
 
 ## Team Allocation  
-- **Corey**  
-  - MQTT infrastructure, online data logging & visualisation  
+- **Corey** - 47450020
+  - MQTT infrastructure, online data logging & visualisation Graphana and InfluxDB  
   - Admin dashboard on M5Core 2  
-  - Optional: blockchain logging for supervisor requirements  
+  - Optional: blockchain logging as per supervisor recommendation 
 
-- **Max**  
+- **Max** - 46985431
   - Facial-recognition ML on Raspberry Pi 5  
   - Thingy:52 sensor integration (temperature, air quality, RGB feedback)  
   - Base Node implementation on nRF52840 DK; serial comms to Pi 5  
 
-- **Peter**  
+- **Peter** - 49040760
   - Ultrasonic sensor and keypad integration on DiscoL475  
-  - Door actuator control (servo or LED)  
-  - Optional: NFC integration  
+  - Door actuator control (servo or LED AS PER TUTOR EXPECTATION)  
+  - Optional: NFC integration  (AS REQUIRED BY TUTOR)
 
 ## System Architecture  
 
@@ -81,10 +84,10 @@ Full integration ensures that:
   > _Placeholder: insert sequence diagram showing PIN/NFC/facial auth → Base Node request → Pi 5 verification → Base Node unlock command → actuator._
 
 ## Deliverables and Key Performance Indicators (KPIs)  
-| KPI ID | Description                                               | Target                                                     |
-| :----: | :-------------------------------------------------------- | :--------------------------------------------------------- |
-| KPI 1   | Authentication success rate                              | ≥ 98% (correct PIN, NFC or facial recognition)            |
-| KPI 2   | Average response time for door actuation                  | ≤ 200 ms from auth decision to actuator signal             |
-| KPI 3   | BLE packet reliability                                    | ≥ 99.5% packet delivery rate between nodes                 |
+| KPI ID  | Description                                               | Target                                                     |
+| :----:  | :-------------------------------------------------------- | :--------------------------------------------------------- |
+| KPI 1   | Authentication success rate                               | ≥ 90% (facial recognition alongside correct PIN and/or NFC |
+| KPI 2   | Average response time for door actuation                  | ≤ 1 s from auth decision to actuator signal                |
+| KPI 3   | BLE packet reliability                                    | ≥ Good packet delivery rate between nodes                  |
 | KPI 4   | Temperature/air-quality reporting latency                 | ≤ 1 s from sensor read to dashboard display                |
-| KPI 5   | System uptime (excluding planned maintenance)             | ≥ 99.9% over 30 days                                      |
+| KPI 5   | System uptime (excluding planned maintenance)             | ≥ Good system reliability                                  |
