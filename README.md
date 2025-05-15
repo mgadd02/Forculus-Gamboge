@@ -94,29 +94,29 @@ Full integration ensures that:
 
 ## Sensors List
 Ultrasonic distance sensor
-– DiscoL475 IoT Discovery Board
-– Detects presence at the door (exit/entry)
+* DiscoL475 IoT Discovery Board
+* Detects presence at the door (exit/entry)
 
 Hall-effect sensor (optional)
-– DiscoL475 IoT Discovery Board
-– Alternative door-position detection
+* DiscoL475 IoT Discovery Board
+* Alternative door-position detection
 
 Keypad
-– DiscoL475 IoT Discovery Board
-– PIN entry for authentication
+* DiscoL475 IoT Discovery Board
+* PIN entry for authentication
 
 NFC reader/writer (optional)
-– DiscoL475 IoT Discovery Board
-– Reads NFC cards for authentication
+* DiscoL475 IoT Discovery Board
+* Reads NFC cards for authentication
 
 Temperature sensor
-– Thingy:52
-– Monitors room temperature
+* Thingy:52
+* Monitors room temperature
 
 Air-quality sensor
-– Thingy:52
-– Measures CO₂, VOCs, etc.
+* Thingy:52
+* Measures CO₂, VOCs, etc.
 
 Camera module (Arducam / ESP32-CAM)
-– Raspberry Pi 5
-– Captures images for CNN facial recognition
+* Raspberry Pi 5
+* Captures images for CNN facial recognition
