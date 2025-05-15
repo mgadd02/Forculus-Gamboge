@@ -91,3 +91,32 @@ Full integration ensures that:
 | KPI 3   | BLE packet reliability                                    | ≥ Good packet delivery rate between nodes                  |
 | KPI 4   | Temperature/air-quality reporting latency                 | ≤ 1 s from sensor read to dashboard display                |
 | KPI 5   | System uptime (excluding planned maintenance)             | ≥ Good system reliability                                  |
+
+## Sensors List
+Ultrasonic distance sensor
+– DiscoL475 IoT Discovery Board
+– Detects presence at the door (exit/entry)
+
+Hall-effect sensor (optional)
+– DiscoL475 IoT Discovery Board
+– Alternative door-position detection
+
+Keypad
+– DiscoL475 IoT Discovery Board
+– PIN entry for authentication
+
+NFC reader/writer (optional)
+– DiscoL475 IoT Discovery Board
+– Reads NFC cards for authentication
+
+Temperature sensor
+– Thingy:52
+– Monitors room temperature
+
+Air-quality sensor
+– Thingy:52
+– Measures CO₂, VOCs, etc.
+
+Camera module (Arducam / ESP32-CAM)
+– Raspberry Pi 5
+– Captures images for CNN facial recognition
