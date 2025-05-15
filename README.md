@@ -58,7 +58,7 @@ The SLARM system uses a Zephyr-based mesh of IoT nodes to control secure access 
 ## System Architecture  
 
 ### Block Diagram  
-(assets/block_diagram.png)
+/assets/block_diagram.png
 
 ### DIKW Pyramid Abstraction  
 - **Data**: Raw sensor readings (temperature, air quality levels, ultrasonic distance, keypad entries, NFC IDs, facial features)  
