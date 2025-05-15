@@ -8,6 +8,8 @@ The SLARM system integrates door access control with environmental monitoring to
 
 INTENDED FOR TEMPERATURE SENSITIVE ENVIRONMENTS SUCH AS COLD ROOMS FOR FOOD STORAGE, OR SERVER/COMPUTE ROOMS.
 
+The SLARM system uses a Zephyr-based mesh of IoT nodes to control secure access and monitor room conditions: a DiscoL475 board at the door handles PIN-Code, NFC and facial-based authentication and drives a servo (or LED) to lock/unlock; an inward-facing ultrasonic sensor automatically opens the door when someone leaves to prevent entrapment; a Thingy:52 node measures temperature and air quality; and a Raspberry Pi 5 with Arducam/ESP32-CAM runs a CNN for facial recognition. All boards communicate via BLE through an nRF52840 base node, which relays data over UART/MQTT to an InfluxDB–Grafana dashboard and the M5Core 2 admin display.
+
 ## Hardware Components  
 - **Primary Door Node (DiscoL475 IoT Discovery Board)**  
   - Keypad for PIN entry
