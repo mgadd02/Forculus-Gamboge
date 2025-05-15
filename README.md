@@ -83,7 +83,8 @@ Full integration ensures that:
 - **Serial (UART)** link between Base Node and Raspberry Pi 5 (frame format: `[HEADER][MSG_TYPE][LENGTH][PAYLOAD][CRC]`)  
 - **MQTT** for cloud logging & remote dashboard (topics: `slarm/temperature`, `slarm/airquality`, `slarm/doorstatus`, `slarm/accesslog`)  
 - **Message Protocol Diagram**  
-  > _Placeholder: insert sequence diagram showing PIN/NFC/facial auth → Base Node request → Pi 5 verification → Base Node unlock command → actuator._
+![image](https://github.com/user-attachments/assets/f1a748b1-dedd-46c3-babf-83043bfb1249)
+
 
 ## Deliverables and Key Performance Indicators (KPIs)  
 | KPI ID  | Description                                               | Target                                                     |
