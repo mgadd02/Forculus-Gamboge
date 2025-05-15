@@ -1,4 +1,4 @@
-# Forculus-Gamboge
+# Team: Forculus-Gamboge
 4011 Team Project. Max, Peter, Corey.
 
 # SLARM: Smart Lock and Room Monitoring System
@@ -54,6 +54,21 @@ The SLARM system uses a Zephyr-based mesh of IoT nodes to control secure access 
   - Ultrasonic sensor and keypad integration on DiscoL475  
   - Optional: NFC integration  (AS REQUIRED BY TUTOR)
   - Bluetooth data emitting to base node.
+
+## Project Timeline
+
+| Start Date  | End Date    | Deliverable                                        | Assigned To    |
+|-------------|-------------|----------------------------------------------------|----------------|
+| 15/05/2025  | 18/05/2025  | Door node hardware & keypad/ultrasonic setup       | Peter          |
+| 15/05/2025  | 20/05/2025  | Thingy:52 sensor integration (temperature & air quality) | Max        |
+| 16/05/2025  | 22/05/2025  | nRF52840 base node BLE & serial communication      | Max            |
+| 18/05/2025  | 24/05/2025  | MQTT broker setup & InfluxDB/Grafana logging       | Corey          |
+| 20/05/2025  | 27/05/2025  | Admin dashboard on M5Core 2                        | Corey          |
+| 17/05/2025  | 25/05/2025  | Facial-recognition CNN integration on Pi 5         | Max            |
+| 22/05/2025  | 28/05/2025  | Full system integration & testing                  | All            |
+| 26/05/2025  | 29/05/2025  | Documentation & README finalisation                | All            |
+
+
 
 ## System Architecture  
 
