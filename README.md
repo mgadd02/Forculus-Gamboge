@@ -52,8 +52,8 @@ The SLARM system uses a Zephyr-based mesh of IoT nodes to control secure access 
 
 - **Peter** - 49040760
   - Ultrasonic sensor and keypad integration on DiscoL475  
-  - Door actuator control (servo or LED AS PER TUTOR EXPECTATION)  
   - Optional: NFC integration  (AS REQUIRED BY TUTOR)
+  - Bluetooth data emitting to base node.
 
 ## System Architecture  
 
