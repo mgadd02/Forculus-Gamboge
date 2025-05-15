@@ -58,7 +58,7 @@ The SLARM system uses a Zephyr-based mesh of IoT nodes to control secure access 
 ## System Architecture  
 
 ### Block Diagram  
-> _Placeholder for block diagram image – insert `assets/block_diagram.png` or draw directly in README. Should show connections between: DiscoL475 (door node), Thingy:52, nRF52840 (base node), Raspberry Pi 5, M5Core 2, and MQTT broker._
+![Block Diagram](/assets/block_diagram.png)
 
 ### DIKW Pyramid Abstraction  
 - **Data**: Raw sensor readings (temperature, air quality levels, ultrasonic distance, keypad entries, NFC IDs, facial features)  
@@ -83,7 +83,8 @@ Full integration ensures that:
 - **Serial (UART)** link between Base Node and Raspberry Pi 5 (frame format: `[HEADER][MSG_TYPE][LENGTH][PAYLOAD][CRC]`)  
 - **MQTT** for cloud logging & remote dashboard (topics: `slarm/temperature`, `slarm/airquality`, `slarm/doorstatus`, `slarm/accesslog`)  
 - **Message Protocol Diagram**  
-  > _Placeholder: insert sequence diagram showing PIN/NFC/facial auth → Base Node request → Pi 5 verification → Base Node unlock command → actuator._
+![image](https://github.com/user-attachments/assets/f1a748b1-dedd-46c3-babf-83043bfb1249)
+
 
 ## Deliverables and Key Performance Indicators (KPIs)  
 | KPI ID  | Description                                               | Target                                                     |
