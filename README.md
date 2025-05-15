@@ -59,6 +59,7 @@ The SLARM system uses a Zephyr-based mesh of IoT nodes to control secure access 
 
 ### Block Diagram  
 ![Block Diagram](/assets/block_diagram.png)
+The ble lines are BLE and red lines are UART. It only shows when github is in darkmode
 
 ### DIKW Pyramid Abstraction  
 - **Data**: Raw sensor readings (temperature, air quality levels, ultrasonic distance, keypad entries, NFC IDs, facial features)  
