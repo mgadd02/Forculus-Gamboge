@@ -11,7 +11,6 @@ INTENDED FOR TEMPERATURE SENSITIVE ENVIRONMENTS SUCH AS COLD ROOMS FOR FOOD STOR
 ## Hardware Components  
 - **Primary Door Node (DiscoL475 IoT Discovery Board)**  
   - Keypad for PIN entry
-  - Hall effect sensor for door presence (IF REQUIRED)
   - NFC reader/writer and NFC card for authentication (IF REQUIRED)
   - Ultrasonic sensor for door‐presence detection  
   - Actuator: LED indicator (base node) or servo motor (door node, IF REQUIRED)  
