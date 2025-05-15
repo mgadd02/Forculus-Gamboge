@@ -5,6 +5,7 @@
 
 ## Project Description  
 The SLARM system integrates door access control with environmental monitoring to provide a secure, data-driven solution for room management. A network of IoT boards handles user authentication, sensor data collection, local and remote dashboards, and actuators (LED or servo) to lock or unlock doors. Australian English spelling and punctuation are used throughout.
+
 INTENDED FOR TEMPERATURE SENSITIVE ENVIRONMENTS SUCH AS COLD ROOMS FOR FOOD STORAGE, OR SERVER/COMPUTE ROOMS.
 
 ## Hardware Components  
