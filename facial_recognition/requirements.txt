@@ -1,0 +1,6 @@
+opencv-python
+face-recognition
+numpy
+scikit-learn
+torch
+facenet-pytorch
