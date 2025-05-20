@@ -3,7 +3,7 @@
 
 / {
     ultrasonic_sensor {
-        compatible = "gpio-leds";
+        compatible = "gpio-keys";
 
         ultrasonic_trig_pin: ultrasonic_trigger {
             gpios = <&gpiob 2 GPIO_ACTIVE_HIGH>; 
@@ -17,7 +17,7 @@
     };
 
     pmod_kypd {
-        compatible = "gpio-leds";
+        compatible = "gpio-keys";
 
         pmod_kypd_col1_pin: pmod_kypd_col1 {
             gpios = <&gpioa 4 GPIO_ACTIVE_HIGH>; 
@@ -53,6 +53,18 @@
         };
     };
 
+    nfc_reader {
+        compatible = "gpio-keys";
+
+        rf-disable: nfc_reader_rf_disable {
+            gpios = <&gpioe 2 GPIO_ACTIVE_HIGH>;
+            label = "RF Disable";
+    };
+        gpo: nfc_reader_gpo {
+            gpios = <&gpioe 5 GPIO_ACTIVE_HIGH>;
+            label = "GPO";
+        };
+
     aliases {
         ultrasonictrig = &ultrasonic_trig_pin;
         ultrasonicecho = &ultrasonic_echo_pin;
@@ -64,5 +76,49 @@
         pmodkypdrow2 = &pmod_kypd_row2_pin;
         pmodkypdrow3 = &pmod_kypd_row3_pin;
         pmodkypdrow4 = &pmod_kypd_row4_pin;
+        nfc_reader_rf_disable = &rf_disable;
+        nfc_reader_gpo = &gpo;
+    };
+};
+
+
+&i2c2 {
+	pinctrl-0 = <&i2c2_scl_pb10 &i2c2_sda_pb11>;
+	pinctrl-names = "default";
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_FAST>;
+
+	lis3mdl-magn@1e {
+		compatible = "st,lis3mdl-magn";
+		reg = <0x1e>;
+	};
+
+	hts221@5f {
+		compatible = "st,hts221";
+		reg = <0x5f>;
+		drdy-gpios = <&gpiod 15 GPIO_ACTIVE_HIGH>;
+	};
+
+	lps22hb-press@5d {
+		compatible = "st,lps22hb-press";
+		reg = <0x5d>;
+	};
+
+	lsm6dsl: lsm6dsl@6a {
+		compatible = "st,lsm6dsl";
+		reg = <0x6a>;
+		irq-gpios = <&gpiod 11 GPIO_ACTIVE_HIGH>;
+	};
+
+	vl53l0x@29 {
+		compatible = "st,vl53l0x";
+		reg = <0x29>;
+		xshut-gpios = <&gpioc 6 GPIO_ACTIVE_LOW>;
+	};
+
+    m24sr64: m24sr64@56 {
+        compatible = "st,m24sr64";
+        reg = <0x56>;
+        status = "okay";
     };
 };
