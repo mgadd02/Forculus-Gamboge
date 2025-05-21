@@ -7,11 +7,11 @@ file(GLOB local_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/*.c
 )
-
 # Global source files
 file(GLOB global_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lib/txBluetooth.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lib/rxBluetooth.c
 )
+
 # Combine all sources
 target_sources(app PRIVATE ${local_sources} ${global_sources})
 

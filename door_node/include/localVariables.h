@@ -1,5 +1,5 @@
-#ifndef GLOBALVARIABLES_H
-#define GLOBALVARIABLES_H
+#ifndef LOCALVARIABLES_H
+#define LOCALVARIABLES_H
 
 #include <stdint.h>
 
@@ -10,5 +10,5 @@ struct ultrasonic_data_t {
 	int distance_cm;
 };
 
-#endif // GLOBALVARIABLES_H
+#endif // LOCALVARIABLES_H
 
