@@ -1,4 +1,5 @@
 #include "pmodkypd.h"
+#include <localVariables.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
@@ -73,23 +74,59 @@ void PmodKypdListener(void)
 {
     PmodKyodInit();
 
+    char pin_code[6]; // 5 digits + null terminator
+    int pin_index = 0;
+    bool waiting_for_B = true;
+
     while (1) {
         for (int col = 0; col < 4; col++) {
-            // Drive current column LOW
             gpio_pin_set_dt(&cols[col], 0);
 
-            // Check each row
             for (int row = 0; row < 4; row++) {
                 if (gpio_pin_get_dt(&rows[row]) == 0) {
-                    printk("Key pressed: %s\n", keymap[row][col]);
-                    k_msleep(200);  // basic debounce
+                    const char *key = keymap[row][col];
+
+                    // Debounce wait
+                    k_msleep(200);
+
+                    if (waiting_for_B) {
+                        if (strcmp(key, "B") == 0) {
+                            printk("Please type in a 5 pin code.\n");
+                            waiting_for_B = false;
+                            pin_index = 0;
+                        }
+                    } else {
+                        if (pin_index < 5) {
+                            pin_code[pin_index++] = key[0];
+                            printk("Digit %d: %c\n", pin_index, key[0]);
+                        }
+
+                        if (pin_index == 5) {
+                            pin_code[5] = '\0'; // null-terminate string
+                            printk("PIN entered: %s\n", pin_code);
+
+                            struct pmodkypd_data_t *pmodkypd_data = k_malloc(sizeof(struct pmodkypd_data_t));
+                            if (!pmodkypd_data) {
+                                printk("Failed to allocate memory for pmodkypd data\n");
+                                continue;
+                            }
+                            memcpy(pmodkypd_data->pin_code, pin_code, sizeof(pin_code));
+                            k_fifo_put(&PMODKYPD_fifo, pmodkypd_data);
+
+                            waiting_for_B = true;  // reset for next session
+                        }
+                    }
+
+                    // Wait until key is released before continuing
+                    while (gpio_pin_get_dt(&rows[row]) == 0) {
+                        k_msleep(10);
+                    }
                 }
             }
 
-            // Drive current column back HIGH
             gpio_pin_set_dt(&cols[col], 1);
         }
 
-        k_msleep(50);  // allow rest before next scan
+        k_msleep(50);
     }
 }
