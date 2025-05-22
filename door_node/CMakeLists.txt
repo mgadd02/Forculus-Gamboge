@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(ultrasonic_node)
+project(door_node)
 
 # Local source files
 file(GLOB local_sources

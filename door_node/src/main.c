@@ -4,7 +4,7 @@
 #include "doorBluetooth.h"
 
 /* scheduling parameters */
-#define STACKSIZE 				1024
+#define STACKSIZE 				4096
 #define PRIORITY 				7
 #define PRIORITY_SENSOR			3
 

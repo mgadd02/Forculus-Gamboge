@@ -4,10 +4,17 @@
 #include <stdint.h>
 
 extern struct k_fifo ULTRASONIC_fifo;
+extern struct k_fifo PMODKYPD_fifo;
 
 struct ultrasonic_data_t {
 	void *fifo_reserved; /* 1st word reserved for use by fifo */
 	int distance_cm;
+};
+
+struct pmodkypd_data_t {
+	void *fifo_reserved; /* 1st word reserved for use by fifo */
+	char pin_code[6]; // 5 digits + null terminator
+
 };
 
 #endif // LOCALVARIABLES_H

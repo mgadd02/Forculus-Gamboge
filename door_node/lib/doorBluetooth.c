@@ -1,8 +1,9 @@
 #include "doorBluetooth.h"
 #include "txBluetooth.h"
+#include "localVariables.h"
 #include <zephyr/kernel.h>
 
-struct bt_uuid_128 device_service_uuid = BT_UUID_INIT_128(
+struct bt_uuid_128 tx_device_service_uuid = BT_UUID_INIT_128(
     0xaa, 0xbb, 0xcc, 0xdd,
     0xee, 0xff,
     0x00, 0x11,
@@ -10,7 +11,7 @@ struct bt_uuid_128 device_service_uuid = BT_UUID_INIT_128(
     0x44, 0x55, 0x66, 0x77
 );
 
-struct bt_uuid_128 device_char_uuid = BT_UUID_INIT_128(
+struct bt_uuid_128 tx_device_char_uuid = BT_UUID_INIT_128(
     0x12, 0x34, 0x56, 0x78,
     0x90, 0xab,
     0xcd, 0xef,
@@ -31,8 +32,12 @@ void bluetooth_sender0(void)
     }
     while (1)
     {
-        send_msg("Hello from door_node");
-        k_sleep(K_SECONDS(5));
+        struct pmodkypd_data_t *pmodkypd_data = k_fifo_get(&PMODKYPD_fifo, K_NO_WAIT);
+        if (pmodkypd_data != NULL) {
+            send_msg(pmodkypd_data->pin_code);
+            k_free(pmodkypd_data);
+        }
+        k_sleep(K_MSEC(1));
     }
 }
 

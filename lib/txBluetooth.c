@@ -9,6 +9,7 @@
 
 static struct bt_conn *default_conn;
 uint16_t discovered_handle = 0;
+
 static struct bt_gatt_discover_params discover_params;
 static struct bt_gatt_write_params write_params;
 static uint16_t svc_start_handle = 0, svc_end_handle = 0;
@@ -50,6 +51,8 @@ static bool adv_data_has_name(struct net_buf_simple *ad, const char *target_name
         if ((type == BT_DATA_NAME_COMPLETE || type == BT_DATA_NAME_SHORTENED) &&
             len - 1 == strlen(target_name) &&
             memcmp(ad->data, target_name, len - 1) == 0) {
+            printk("Found match: %.*s\n", len - 1, ad->data);
+
             return true;
         }
 
@@ -89,6 +92,12 @@ static struct bt_conn_auth_cb auth_cb = {
 };
 
 static void connected(struct bt_conn *conn, uint8_t err) {
+    if (err) {
+        printk("Connection failed (err %u)\n", err);
+        return;
+    }
+
+    default_conn = bt_conn_ref(conn);  // ✅ Properly store connection
     printk("Connected\n");
 
     int auth_err = bt_conn_set_security(conn, BT_SECURITY_L2);
@@ -99,6 +108,10 @@ static void connected(struct bt_conn *conn, uint8_t err) {
 
 static void disconnected(struct bt_conn *conn, uint8_t reason) {
     printk("Disconnected (reason %u)\n", reason);
+    if (default_conn) {
+        bt_conn_unref(default_conn);
+        default_conn = NULL;
+    }
 }
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
@@ -113,7 +126,7 @@ static uint8_t discover_char_func(struct bt_conn *conn, const struct bt_gatt_att
     }
 
     const struct bt_gatt_chrc *chrc = attr->user_data;
-    if (bt_uuid_cmp(chrc->uuid, &device_char_uuid.uuid) == 0) {
+    if (bt_uuid_cmp(chrc->uuid, &tx_device_char_uuid.uuid) == 0) {
         discovered_handle = chrc->value_handle;
         printk("Discovered characteristic handle: 0x%04x\n", discovered_handle);
     }
@@ -127,7 +140,7 @@ static uint8_t discover_service_func(struct bt_conn *conn, const struct bt_gatt_
     if (!attr) {
         printk("Service discovery complete\n");
         if (svc_start_handle && svc_end_handle) {
-            discover_params.uuid = &device_char_uuid.uuid;
+            discover_params.uuid = &tx_device_char_uuid.uuid;
             discover_params.func = discover_char_func;
             discover_params.start_handle = svc_start_handle;
             discover_params.end_handle = svc_end_handle;
@@ -153,7 +166,7 @@ static uint8_t discover_service_func(struct bt_conn *conn, const struct bt_gatt_
 
 void discover_device_char(void) {
     memset(&discover_params, 0, sizeof(discover_params));
-    discover_params.uuid = &device_service_uuid.uuid;
+    discover_params.uuid = &tx_device_service_uuid.uuid;
     discover_params.func = discover_service_func;
     discover_params.start_handle = 0x0001;
     discover_params.end_handle = 0xffff;
@@ -165,9 +178,12 @@ void discover_device_char(void) {
     }
 }
 
+volatile bool discovery_ready = false;
+
 static void pairing_complete(struct bt_conn *conn, bool bonded) {
     printk("Pairing complete, bonded: %d\n", bonded);
     discover_device_char();
+    discovery_ready = true;  // ✅ Set flag when discovery is initiated
 }
 
 static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason) {
@@ -183,7 +199,7 @@ static struct bt_conn_auth_info_cb auth_info_cb = {
 
 void bluetooth_scanner(void) {
     int err = bt_enable(NULL);
-    if (err) {
+    if (err && err != -120) {
         printk("Bluetooth init failed (err %d)\n", err);
         return;
     }
