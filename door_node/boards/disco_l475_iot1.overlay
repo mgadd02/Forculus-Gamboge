@@ -1,0 +1,68 @@
+// Delete slot1 and slot2 to enable rearranging of paritions
+
+
+/ {
+    ultrasonic_sensor {
+        compatible = "gpio-leds";
+
+        ultrasonic_trig_pin: ultrasonic_trigger {
+            gpios = <&gpiob 2 GPIO_ACTIVE_HIGH>; 
+            label = "Ultrasonic Trigger";
+        };
+
+        ultrasonic_echo_pin: ultrasonic_echo {
+            gpios = <&gpioa 15  GPIO_ACTIVE_HIGH>; 
+            label = "Ultrasonic Echo";
+        };
+    };
+
+    pmod_kypd {
+        compatible = "gpio-leds";
+
+        pmod_kypd_col1_pin: pmod_kypd_col1 {
+            gpios = <&gpioa 4 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD column 1";
+        };
+        pmod_kypd_col2_pin: pmod_kypd_col2 {
+            gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD column 2";
+        };
+        pmod_kypd_col3_pin: pmod_kypd_col3 {
+            gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD column 3";
+        };
+        pmod_kypd_col4_pin: pmod_kypd_col4 {
+            gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD column 4";
+        };
+        pmod_kypd_row1_pin: pmod_kypd_row1 {
+            gpios = <&gpiob 0 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD row 1";
+        };
+        pmod_kypd_row2_pin: pmod_kypd_row2 {
+            gpios = <&gpiod 14 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD row 2";
+        };
+        pmod_kypd_row3_pin: pmod_kypd_row3 {
+            gpios = <&gpioa 0 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD row 3";
+        };
+        pmod_kypd_row4_pin: pmod_kypd_row4 {
+            gpios = <&gpioa 1 GPIO_ACTIVE_HIGH>; 
+            label = "Pmod KYPD row 4";
+        };
+    };
+
+    aliases {
+        ultrasonictrig = &ultrasonic_trig_pin;
+        ultrasonicecho = &ultrasonic_echo_pin;
+        pmodkypdcol1 = &pmod_kypd_col1_pin;
+        pmodkypdcol2 = &pmod_kypd_col2_pin;
+        pmodkypdcol3 = &pmod_kypd_col3_pin;
+        pmodkypdcol4 = &pmod_kypd_col4_pin;
+        pmodkypdrow1 = &pmod_kypd_row1_pin;
+        pmodkypdrow2 = &pmod_kypd_row2_pin;
+        pmodkypdrow3 = &pmod_kypd_row3_pin;
+        pmodkypdrow4 = &pmod_kypd_row4_pin;
+    };
+};
