@@ -25,18 +25,32 @@ void bluetooth_sender0(void)
 {
     bluetooth_scanner();
 
-
     while (!discovered_handle) {
-    printk("Waiting for discovery...\n");
-    k_sleep(K_SECONDS(5));
+        printk("Waiting for discovery...\n");
+        k_sleep(K_SECONDS(5));
     }
+
     while (1)
     {
         struct pmodkypd_data_t *pmodkypd_data = k_fifo_get(&PMODKYPD_fifo, K_NO_WAIT);
         if (pmodkypd_data != NULL) {
-            send_msg(pmodkypd_data->pin_code);
+            char msg[32];
+            snprintf(msg, sizeof(msg), "pin,%s", pmodkypd_data->pin_code);
+            printk("Sending to base: %s\n", msg);
+            send_msg(msg);
             k_free(pmodkypd_data);
         }
+        
+
+        struct ultrasonic_data_t *ultrasonic_data = k_fifo_get(&ULTRASONIC_fifo, K_NO_WAIT);
+        if (ultrasonic_data != NULL) {
+            char msg[32];
+            snprintf(msg, sizeof(msg), "ultrasonic,%c", ultrasonic_data->proximity ? '1' : '0');
+            printk("Sending to base: %s\n", msg);
+            send_msg(msg);
+            k_free(ultrasonic_data);
+        }
+
         k_sleep(K_MSEC(1));
     }
 }

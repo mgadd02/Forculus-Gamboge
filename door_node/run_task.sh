@@ -33,7 +33,7 @@ if echo "$west_build_output" | grep -q "Linking C executable"; then
     echo "$west_build_output"
     echo "Flashing the firmware..."
     west flash --runner jlink
-    screen /dev/ttyACM1 115200
+    # screen /dev/ttyACM0 115200
 else
     echo "Build failed. Output:"
     echo "$west_build_output"

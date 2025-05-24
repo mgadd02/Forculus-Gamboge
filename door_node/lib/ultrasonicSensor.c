@@ -1,4 +1,4 @@
-#include "ultrasonicSensor.h"
+ #include "ultrasonicSensor.h"
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
@@ -7,6 +7,7 @@
 #include <zephyr/bluetooth/addr.h>
 #include "localVariables.h"
 #include <zephyr/sys_clock.h> 
+#include <stdbool.h>
 
 // Define nodes for data and clock
 #define ULTRASONIC_TRIGGER_NODE  DT_ALIAS(ultrasonictrig)
@@ -37,6 +38,7 @@ void UltrasonicSensorInit(void)
 void UltrasonicSensorRead(void)
 {
     UltrasonicSensorInit();
+    bool was_near = false;
 
     while (1) {
         gpio_pin_set_dt(&ultrasonic_trig, 0);
@@ -53,18 +55,22 @@ void UltrasonicSensorRead(void)
 
         uint32_t cycles = end - start;
         uint64_t duration_us = (uint64_t)cycles * 1000000U / CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC;
+        uint32_t dist_cm = duration_us / 58;
 
-        uint32_t dist_cm = duration_us / 58; // Standard formula for HC-SR04
 
-        printk("duration: %llu µs, distance: %u cm\n", duration_us, dist_cm);
+        bool is_near = dist_cm <= 30;
+        if (is_near != was_near) {
+            was_near = is_near;
 
-        struct ultrasonic_data_t *ultrasonic_data = k_malloc(sizeof(struct ultrasonic_data_t));
-        if (!ultrasonic_data) {
-            printk("Failed to allocate memory for ultrasonic data\n");
-            continue;
+            struct ultrasonic_data_t *ultrasonic_data = k_malloc(sizeof(struct ultrasonic_data_t));
+            if (!ultrasonic_data) {
+                printk("Failed to allocate memory for ultrasonic data\n");
+            } else {
+                ultrasonic_data->proximity = is_near;
+                k_fifo_put(&ULTRASONIC_fifo, ultrasonic_data);
+            }
         }
-        ultrasonic_data->distance_cm = dist_cm;
-        k_fifo_put(&ULTRASONIC_fifo, ultrasonic_data);
+
         k_sleep(K_MSEC(100));
     }
 }
