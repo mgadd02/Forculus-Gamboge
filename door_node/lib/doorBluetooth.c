@@ -51,7 +51,16 @@ void bluetooth_sender0(void)
             k_free(ultrasonic_data);
         }
 
-        k_sleep(K_MSEC(1));
+        struct magnetometer_data_t *magnetometer_data = k_fifo_get(&MAGNETOMETER_fifo, K_NO_WAIT);
+        if (magnetometer_data != NULL) {
+            char msg[32];
+            snprintf(msg, sizeof(msg), "magnetometer,%c", magnetometer_data->door_opened ? '1' : '0');
+            printk("Sending to base: %s\n", msg);
+            send_msg(msg);
+            k_free(magnetometer_data);
+        }
+
+        k_sleep(K_MSEC(50));
     }
 }
 

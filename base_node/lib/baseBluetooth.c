@@ -51,28 +51,42 @@ void bluetooth_receiver0(void)
     while (1) {
         const char *msg = get_received_data();
 
+        // Check for new message
         if (strncmp(current_msg, msg, sizeof(current_msg)) != 0) {
             strncpy(current_msg, msg, sizeof(current_msg) - 1);
             current_msg[sizeof(current_msg) - 1] = '\0';
-            printk("Received from received_data: %s\n", current_msg);
+            char type[16];
+            char value;
 
-            // Check for "pin" prefix
-            if (strncmp(current_msg, "pin,", 4) == 0 && current_msg[4] != '\0') {
-                printk("Receiver pin: %s\n", &current_msg[4]);
-            }
-            // Check for "ultrasonic" prefix
-            else if (strncmp(current_msg, "ultrasonic,", 11) == 0 && current_msg[11] != '\0') {
-                if (current_msg[11] == '1') {
-                    printk("Someone is in proximity\n");
-                } else if (current_msg[11] == '0') {
-                    printk("Someone left proximity\n");
+            if (sscanf(current_msg, "%15[^,],%c", type, &value) == 2) {
+
+                if (strcmp(type, "pin") == 0) {
+                    printk("Receiver pin: %s\n", &current_msg[4]); // Or print whole string
+                } else if (strcmp(type, "ultrasonic") == 0) {
+                    if (value == '1') {
+                        printk("Someone is in proximity\n");
+                    } else if (value == '0') {
+                        printk("Someone left proximity\n");
+                    } else {
+                        printk("Unknown ultrasonic state: %c\n", value);
+                    }
+                } else if (strcmp(type, "magnetometer") == 0) {
+                    if (value == '1') {
+                        printk("Door is opened\n");
+                    } else if (value == '0') {
+                        printk("Door is closed\n");
+                    } else {
+                        printk("Unknown magnetometer state: %c\n", value);
+                    }
                 } else {
-                    printk("Unknown ultrasonic state: %c\n", current_msg[11]);
+                    printk("Unknown sensor type: %s\n", type);
                 }
+            } else {
+                printk("Invalid message format: %s\n", current_msg);
             }
         }
 
-        k_sleep(K_MSEC(10));
+        k_sleep(K_MSEC(50));
     }
 }
 

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 extern struct k_fifo ULTRASONIC_fifo;
 extern struct k_fifo PMODKYPD_fifo;
+extern struct k_fifo MAGNETOMETER_fifo;
 
 struct ultrasonic_data_t {
 	void *fifo_reserved; /* 1st word reserved for use by fifo */
@@ -17,5 +18,9 @@ struct pmodkypd_data_t {
 
 };
 
+struct magnetometer_data_t {
+	void *fifo_reserved; /* 1st word reserved for use by fifo */
+	bool door_opened;
+};
 #endif // LOCALVARIABLES_H
 
