@@ -27,7 +27,6 @@ void set_servo_locked(bool locked)
         printk("Failed to move servo to %s position (err %d)\n",
                locked ? "locked" : "unlocked", ret);
     } else {
-        printk("Servo moved to %s position\n", locked ? "locked" : "unlocked");
     }
 }
 

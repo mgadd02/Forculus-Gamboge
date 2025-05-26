@@ -4,6 +4,13 @@
 #include <zephyr/kernel.h>
 #include "servo.h"
 #include <stdbool.h>
+#include <stdlib.h>
+#include "localVariables.h"
+
+volatile int latest_distance_cm = -1;
+volatile int latest_avg_value = -1;
+volatile bool door_locked = -1;
+
 struct relay_msg_t {
     char payload[21];
 };
@@ -49,6 +56,7 @@ void bluetooth_receiver0(void)
     bluetooth_advertiser();
     char current_msg[21] = {0};
 
+
     while (1) {
         const char *msg = get_received_data();
 
@@ -59,44 +67,30 @@ void bluetooth_receiver0(void)
             char type[16];
             char value;
 
-            if (sscanf(current_msg, "%15[^,],%c", type, &value) == 2) {
+            if (sscanf(current_msg, "%20[^,],%c", type, &value) == 2) {
 
                 if (strcmp(type, "pin") == 0) {
                     const char *pin = &current_msg[4];
-                    printk("Receiver pin: %s\n", pin);
-
-                    if (strcmp(pin, "22366") == 0) {
-                        printk("Correct PIN entered. Unlocking for 6 seconds...\n");
-                        set_servo_locked(false);  // Unlock
-                        k_sleep(K_SECONDS(6));
-                        set_servo_locked(true);   // Lock again
-                        printk("Re-locked after 6 seconds.\n");
-                    } else {
-                        printk("Incorrect PIN or unknown command: %s\n", pin);
-                    }
+                    printk("pin: %s\n", pin);
                 } else if (strcmp(type, "ultrasonic") == 0) {
                     if (value == '1') {
-                        printk("Someone is in proximity\n");
                         set_servo_locked(false);
+                        door_locked = false;
                     } else if (value == '0') {
-                        printk("Someone left proximity\n");
                         set_servo_locked(true);
-                    } else {
-                        printk("Unknown ultrasonic state: %c\n", value);
-                    }
+                        door_locked = true;
+                    } 
                 } else if (strcmp(type, "magnetometer") == 0) {
                     if (value == '1') {
-                        printk("Door is opened\n");
                     } else if (value == '0') {
-                        printk("Door is closed\n");
-                    } else {
-                        printk("Unknown magnetometer state: %c\n", value);
-                    }
+                    } 
+                } else if (strcmp(type, "ultrasonic_s") == 0) {
+                    latest_distance_cm = atoi(&current_msg[13]);
+                } else if (strcmp(type, "magnetometer_s") == 0) {
+                    latest_avg_value = atoi(&current_msg[15]);
                 } else {
-                    printk("Unknown sensor type: %s\n", type);
                 }
             } else {
-                printk("Invalid message format: %s\n", current_msg);
             }
         }
 

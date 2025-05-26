@@ -70,7 +70,14 @@ void UltrasonicSensorRead(void)
                 k_fifo_put(&ULTRASONIC_fifo, ultrasonic_data);
             }
         }
+        struct ultrasonic_sample_data_t *sample_data = k_malloc(sizeof(struct ultrasonic_sample_data_t));
+        if (!sample_data) {
+            printk("Failed to allocate memory for ultrasonic sample data\n");
+        } else {
 
+            sample_data->distance_cm = dist_cm;
+            k_fifo_put(&ULTRASONIC_SAMPLE_fifo, sample_data);
+        }
         k_sleep(K_MSEC(100));
     }
 }

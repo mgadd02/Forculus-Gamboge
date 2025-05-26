@@ -63,6 +63,13 @@ void MagnetometerSensorRead(void)
             data->door_opened = door_open;
             k_fifo_put(&MAGNETOMETER_fifo, data);
         }
+        struct magnetometer_sample_data_t *sample_data = k_malloc(sizeof(struct magnetometer_sample_data_t));
+        if (!sample_data) {
+            printk("Failed to allocate magnetometer_sample_data_t\n");
+            continue;
+        }
+        sample_data->avg_magnetometer_value = (int)(avg*100); // Store as integer percentage
+        k_fifo_put(&MAGNETOMETER_SAMPLE_fifo, sample_data);
 
         k_sleep(K_MSEC(100));
     }

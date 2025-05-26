@@ -26,7 +26,6 @@ static ssize_t write_handler(struct bt_conn *conn, const struct bt_gatt_attr *at
     memcpy(received_data, buf, len);
     received_data[len] = '\0'; // Null-terminate for safe string use
 
-    printk("Received: %s\n", received_data);
 
     // Optional: also store it in data_buffer if needed for read_handler
     memcpy(data_buffer, received_data, len + 1);

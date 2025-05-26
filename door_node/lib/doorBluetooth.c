@@ -59,8 +59,22 @@ void bluetooth_sender0(void)
             send_msg(msg);
             k_free(magnetometer_data);
         }
-
+        struct ultrasonic_sample_data_t *ultrasonic_sample_data = k_fifo_get(&ULTRASONIC_SAMPLE_fifo, K_NO_WAIT);
+        if (ultrasonic_sample_data != NULL) {
+            char msg[32];
+            snprintf(msg, sizeof(msg), "ultrasonic_s,%d", ultrasonic_sample_data->distance_cm);
+            printk("Sending to base: %s\n", msg);
+            send_msg(msg);
+            k_free(ultrasonic_sample_data);
+        }
+        struct magnetometer_sample_data_t *magnetometer_sample_data = k_fifo_get(&MAGNETOMETER_SAMPLE_fifo, K_NO_WAIT);
+        if (magnetometer_sample_data != NULL) {
+            char msg[32];
+            snprintf(msg, sizeof(msg), "magnetometer_s,%d", magnetometer_sample_data->avg_magnetometer_value);
+            printk("Sending to base: %s\n", msg);
+            send_msg(msg);
+            k_free(magnetometer_sample_data);
+        }
         k_sleep(K_MSEC(50));
     }
 }
-
