@@ -158,10 +158,10 @@ class CameraTab(ttk.Frame):
                     idx, prob = np.argmax(probs), np.max(probs)
                     name = self.svm.classes_[idx]
                     if prob >= THRESHOLD:
-                        label, color = f"✔ {name} ({prob:.2f})", (0,255,0)
+                        label, color = f"{name} ({prob:.2f})", (0,255,0)
                         self.log_message(f"Authorized: {name} ({prob:.2f})")
                     else:
-                        label, color = f"✖ Unknown ({prob:.2f})", (0,0,255)
+                        label, color = f"Unknown ({prob:.2f})", (0,0,255)
                         self.log_message(f"Unauthorized ({prob:.2f})")
                     detection = (top, right, bottom, left, label, color)
                 else:
