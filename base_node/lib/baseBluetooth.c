@@ -2,7 +2,8 @@
 #include "rxBluetooth.h"
 #include "txBluetooth.h"
 #include <zephyr/kernel.h>
-
+#include "servo.h"
+#include <stdbool.h>
 struct relay_msg_t {
     char payload[21];
 };
@@ -61,12 +62,25 @@ void bluetooth_receiver0(void)
             if (sscanf(current_msg, "%15[^,],%c", type, &value) == 2) {
 
                 if (strcmp(type, "pin") == 0) {
-                    printk("Receiver pin: %s\n", &current_msg[4]); // Or print whole string
+                    const char *pin = &current_msg[4];
+                    printk("Receiver pin: %s\n", pin);
+
+                    if (strcmp(pin, "22366") == 0) {
+                        printk("Correct PIN entered. Unlocking for 6 seconds...\n");
+                        set_servo_locked(false);  // Unlock
+                        k_sleep(K_SECONDS(6));
+                        set_servo_locked(true);   // Lock again
+                        printk("Re-locked after 6 seconds.\n");
+                    } else {
+                        printk("Incorrect PIN or unknown command: %s\n", pin);
+                    }
                 } else if (strcmp(type, "ultrasonic") == 0) {
                     if (value == '1') {
                         printk("Someone is in proximity\n");
+                        set_servo_locked(false);
                     } else if (value == '0') {
                         printk("Someone left proximity\n");
+                        set_servo_locked(true);
                     } else {
                         printk("Unknown ultrasonic state: %c\n", value);
                     }
