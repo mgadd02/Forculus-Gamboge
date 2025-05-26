@@ -5,7 +5,7 @@
 #include <zephyr/autoconf.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/addr.h>
-#include "globalVariables.h"
+#include "localVariables.h"
 #include <zephyr/sys_clock.h> 
 
 // Define nodes for data and clock
