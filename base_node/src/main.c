@@ -1,7 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include "baseBluetooth.h"
-
+#include "servo.h"
 /* scheduling parameters */
 #define STACKSIZE 				4096
 #define PRIORITY 				7
