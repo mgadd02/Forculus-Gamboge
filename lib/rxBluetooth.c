@@ -41,7 +41,7 @@ BT_GATT_SERVICE_DEFINE(generic_svc,
 
     BT_GATT_CHARACTERISTIC(&rx_device_char_uuid.uuid,
         BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
-        BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+        BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT,
         read_handler, write_handler, NULL),
 );
 

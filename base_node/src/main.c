@@ -8,4 +8,3 @@
 #define PRIORITY_SENSOR			3
 
 K_THREAD_DEFINE(bluetooth_receiver0_id, STACKSIZE, bluetooth_receiver0, NULL, NULL, NULL, PRIORITY, 0, 0);
-// K_THREAD_DEFINE(bluetooth_sender0_id, STACKSIZE, bluetooth_sender0, NULL, NULL, NULL, PRIORITY, 0, 0);

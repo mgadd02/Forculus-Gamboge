@@ -3,6 +3,12 @@
 #include "txBluetooth.h"
 #include <zephyr/kernel.h>
 
+struct relay_msg_t {
+    char payload[21];
+};
+
+K_FIFO_DEFINE(relay_fifo);
+
 struct bt_uuid_128 rx_device_service_uuid = BT_UUID_INIT_128(
     0xaa, 0xbb, 0xcc, 0xdd,
     0xee, 0xff,
@@ -40,30 +46,49 @@ char device_name[] = "display_node";
 void bluetooth_receiver0(void)
 {
     bluetooth_advertiser();
-    char current_msg[21] = {0}; 
-    {
+    char current_msg[21] = {0};
+
+    while (1) {
         const char *msg = get_received_data();
 
+        // Check for new message
         if (strncmp(current_msg, msg, sizeof(current_msg)) != 0) {
             strncpy(current_msg, msg, sizeof(current_msg) - 1);
-            current_msg[sizeof(current_msg) - 1] = '\0'; 
-            printk("Received from received_data: %s\n", current_msg);
+            current_msg[sizeof(current_msg) - 1] = '\0';
+            char type[16];
+            char value;
+
+            if (sscanf(current_msg, "%15[^,],%c", type, &value) == 2) {
+
+                if (strcmp(type, "pin") == 0) {
+                    printk("Receiver pin: %s\n", &current_msg[4]); // Or print whole string
+                } else if (strcmp(type, "ultrasonic") == 0) {
+                    if (value == '1') {
+                        printk("Someone is in proximity\n");
+                    } else if (value == '0') {
+                        printk("Someone left proximity\n");
+                    } else {
+                        printk("Unknown ultrasonic state: %c\n", value);
+                    }
+                } else if (strcmp(type, "magnetometer") == 0) {
+                    if (value == '1') {
+                        printk("Door is opened\n");
+                    } else if (value == '0') {
+                        printk("Door is closed\n");
+                    } else {
+                        printk("Unknown magnetometer state: %c\n", value);
+                    }
+                } else {
+                    printk("Unknown sensor type: %s\n", type);
+                }
+            } else {
+                printk("Invalid message format: %s\n", current_msg);
+            }
         }
 
-        k_sleep(K_MSEC(10));
+        k_sleep(K_MSEC(50));
     }
 }
 
 
-void bluetooth_sender0(void){
-    bluetooth_scanner();
-    while (!discovery_ready || !discovered_handle) {
-    printk("Waiting for discovery and pairing...\n");
-    k_sleep(K_SECONDS(1));
-}
-    while (1)
-    {
-        send_msg("Hello from base_node");
-        k_sleep(K_SECONDS(5));
-    }
-}
+

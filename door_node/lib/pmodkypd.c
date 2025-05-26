@@ -69,14 +69,13 @@ const char *keymap[4][4] = {
     {"7", "8", "9", "C"},
     {"0", "F", "E", "D"},
 };
-
 void PmodKypdListener(void)
 {
     PmodKyodInit();
 
     char pin_code[6]; // 5 digits + null terminator
     int pin_index = 0;
-    bool waiting_for_B = true;
+    bool waiting_for_F = true;
 
     while (1) {
         for (int col = 0; col < 4; col++) {
@@ -89,10 +88,13 @@ void PmodKypdListener(void)
                     // Debounce wait
                     k_msleep(200);
 
-                    if (waiting_for_B) {
-                        if (strcmp(key, "B") == 0) {
-                            printk("Please type in a 5 pin code.\n");
-                            waiting_for_B = false;
+                    // Print every key pressed
+                    printk("Button pressed: %s\n", key);
+
+                    if (waiting_for_F) {
+                        if (strcmp(key, "F") == 0) {
+                            printk("Please type in a 5-digit pin code.\n");
+                            waiting_for_F = false;
                             pin_index = 0;
                         }
                     } else {
@@ -113,7 +115,7 @@ void PmodKypdListener(void)
                             memcpy(pmodkypd_data->pin_code, pin_code, sizeof(pin_code));
                             k_fifo_put(&PMODKYPD_fifo, pmodkypd_data);
 
-                            waiting_for_B = true;  // reset for next session
+                            waiting_for_F = true;  // reset for next session
                         }
                     }
 
