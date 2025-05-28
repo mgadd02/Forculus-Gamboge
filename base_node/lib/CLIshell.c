@@ -2,7 +2,6 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/sys/time_units.h>
 #include <zephyr/logging/log.h>
-// #include <zephyr/logging/log_ctrl.h>
 #include <zephyr/logging/log_backend.h>
 #include "CLIshell.h"
 #include "localVariables.h"

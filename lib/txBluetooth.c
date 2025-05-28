@@ -18,8 +18,6 @@ static uint16_t svc_start_handle = 0, svc_end_handle = 0;
 static void write_cb(struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *params) {
     if (err) {
         printk("Write failed: 0x%02x\n", err);
-    } else {
-        printk("Write successful\n");
     }
 }
 
@@ -35,7 +33,6 @@ void send_msg(const char *msg) {
     write_params.length = strlen(msg);
     write_params.func = write_cb;
 
-    printk("Sending '%s' to handle 0x%04x (len %d)\n", msg, discovered_handle, write_params.length);
 
     int err = bt_gatt_write(default_conn, &write_params);
     if (err) {

@@ -13,6 +13,12 @@
 #define PMODKYPD_ROW2_NODE  DT_ALIAS(pmodkypdrow2)
 #define PMODKYPD_ROW3_NODE  DT_ALIAS(pmodkypdrow3)
 #define PMODKYPD_ROW4_NODE  DT_ALIAS(pmodkypdrow4)
+#define PMODKYPD_LED0_NODE  DT_ALIAS(led0)
+
+struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(PMODKYPD_LED0_NODE, gpios);
+
+
+
 
 static struct gpio_dt_spec cols[4];
 static struct gpio_dt_spec rows[4];
@@ -39,6 +45,7 @@ void PmodKyodInit(void)
     rows[1] = pmodkypd_row2;
     rows[2] = pmodkypd_row3;
     rows[3] = pmodkypd_row4;
+    gpio_pin_configure_dt(&led0, GPIO_OUTPUT_INACTIVE);
 
     for (int i = 0; i < 4; i++) {
         int ret;
@@ -93,6 +100,11 @@ void PmodKypdListener(void)
 
                     if (waiting_for_F) {
                         if (strcmp(key, "F") == 0) {
+                            // Blink LED0 once
+                            gpio_pin_set_dt(&led0, 1);
+                            k_msleep(150);
+                            gpio_pin_set_dt(&led0, 0);
+
                             printk("Please type in a 5-digit pin code.\n");
                             waiting_for_F = false;
                             pin_index = 0;
@@ -101,10 +113,15 @@ void PmodKypdListener(void)
                         if (pin_index < 5) {
                             pin_code[pin_index++] = key[0];
                             printk("Digit %d: %c\n", pin_index, key[0]);
+
+                            // Blink LED1 once
+                            gpio_pin_set_dt(&led0, 1);
+                            k_msleep(50);
+                            gpio_pin_set_dt(&led0, 0);
                         }
 
                         if (pin_index == 5) {
-                            pin_code[5] = '\0'; // null-terminate string
+                            pin_code[5] = '\0';
                             printk("PIN entered: %s\n", pin_code);
 
                             struct pmodkypd_data_t *pmodkypd_data = k_malloc(sizeof(struct pmodkypd_data_t));
@@ -115,9 +132,15 @@ void PmodKypdListener(void)
                             memcpy(pmodkypd_data->pin_code, pin_code, sizeof(pin_code));
                             k_fifo_put(&PMODKYPD_fifo, pmodkypd_data);
 
-                            waiting_for_F = true;  // reset for next session
+                            // Turn on both LEDs for 3 seconds
+                            gpio_pin_set_dt(&led0, 1);
+                            k_sleep(K_SECONDS(3));
+                            gpio_pin_set_dt(&led0, 0);
+
+                            waiting_for_F = true;
                         }
                     }
+
 
                     // Wait until key is released before continuing
                     while (gpio_pin_get_dt(&rows[row]) == 0) {

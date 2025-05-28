@@ -78,6 +78,6 @@ void UltrasonicSensorRead(void)
             sample_data->distance_cm = dist_cm;
             k_fifo_put(&ULTRASONIC_SAMPLE_fifo, sample_data);
         }
-        k_sleep(K_MSEC(100));
+        k_sleep(K_MSEC(500));
     }
 }

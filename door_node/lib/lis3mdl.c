@@ -71,6 +71,6 @@ void MagnetometerSensorRead(void)
         sample_data->avg_magnetometer_value = (int)(avg*100); // Store as integer percentage
         k_fifo_put(&MAGNETOMETER_SAMPLE_fifo, sample_data);
 
-        k_sleep(K_MSEC(100));
+        k_sleep(K_MSEC(500));
     }
 }

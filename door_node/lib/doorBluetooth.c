@@ -36,7 +36,6 @@ void bluetooth_sender0(void)
         if (pmodkypd_data != NULL) {
             char msg[32];
             snprintf(msg, sizeof(msg), "pin,%s", pmodkypd_data->pin_code);
-            printk("Sending to base: %s\n", msg);
             send_msg(msg);
             k_free(pmodkypd_data);
         }
@@ -46,7 +45,6 @@ void bluetooth_sender0(void)
         if (ultrasonic_data != NULL) {
             char msg[32];
             snprintf(msg, sizeof(msg), "ultrasonic,%c", ultrasonic_data->proximity ? '1' : '0');
-            printk("Sending to base: %s\n", msg);
             send_msg(msg);
             k_free(ultrasonic_data);
         }
@@ -55,7 +53,6 @@ void bluetooth_sender0(void)
         if (magnetometer_data != NULL) {
             char msg[32];
             snprintf(msg, sizeof(msg), "magnetometer,%c", magnetometer_data->door_opened ? '1' : '0');
-            printk("Sending to base: %s\n", msg);
             send_msg(msg);
             k_free(magnetometer_data);
         }
@@ -63,7 +60,6 @@ void bluetooth_sender0(void)
         if (ultrasonic_sample_data != NULL) {
             char msg[32];
             snprintf(msg, sizeof(msg), "ultrasonic_s,%d", ultrasonic_sample_data->distance_cm);
-            printk("Sending to base: %s\n", msg);
             send_msg(msg);
             k_free(ultrasonic_sample_data);
         }
@@ -71,7 +67,6 @@ void bluetooth_sender0(void)
         if (magnetometer_sample_data != NULL) {
             char msg[32];
             snprintf(msg, sizeof(msg), "magnetometer_s,%d", magnetometer_sample_data->avg_magnetometer_value);
-            printk("Sending to base: %s\n", msg);
             send_msg(msg);
             k_free(magnetometer_sample_data);
         }

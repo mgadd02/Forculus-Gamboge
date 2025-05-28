@@ -5,8 +5,8 @@
 #include <stdbool.h>
 
 #define PWM_PERIOD_US       20000U      // 20 ms
-#define LOCKED_PULSE_US      700U       // 0.7 ms pulse for locked
-#define UNLOCKED_PULSE_US   2500U       // 2.5 ms pulse for unlocked
+#define LOCKED_PULSE_US     2500U       // 2.5 ms pulse for locked
+#define UNLOCKED_PULSE_US   700U       // 0.7 ms pulse for unlocked
 
 static const struct pwm_dt_spec servo_pwm = PWM_DT_SPEC_GET(DT_ALIAS(pwm_servo));
 
