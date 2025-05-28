@@ -7,7 +7,7 @@ int start_wifi(void);
 LOG_MODULE_REGISTER(MAIN);
  
 #define WIFI_SSID "Nothing Phone (2a)_6061"     /* Replace `SSID` with WiFi ssid. */
-#define WIFI_PSK  ""               /* Replace `PASSWORD` with Router password. */
+#define WIFI_PSK  "Myphonerocks1"               /* Replace `PASSWORD` with Router password. */
  
 #define NET_EVENT_WIFI_MASK \
     (NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT)

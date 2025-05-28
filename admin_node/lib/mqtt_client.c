@@ -7,8 +7,11 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/kernel.h>
 #include <string.h>
+#include <zephyr/data/json.h>
+#include <zephyr/sys/printk.h>
+#include <stdbool.h>
 
-#include <mqtt_client.h>
+#include "mqtt_client.h"
 
 LOG_MODULE_REGISTER(mqtt_sub, LOG_LEVEL_INF);
 
@@ -25,6 +28,75 @@ static bool subscribed = false;
 
 static struct pollfd fds[1];
 static int nfds;
+
+K_FIFO_DEFINE(mqtt_lvgl_fifo);
+
+void parse_bracketed_pairs(const char *input, mqtt_lvgl_data_t *data) {
+    const char *p = input;
+    char key[32], value[32];
+
+    while ((p = strchr(p, '[')) != NULL) {
+        p++;  // move past '['
+
+        // Find closing bracket
+        const char *end = strchr(p, ']');
+        if (!end) break;
+
+        // Copy content between [ and ]
+        size_t len = end - p;
+        char pair[64];
+        if (len >= sizeof(pair)) len = sizeof(pair) - 1;
+        strncpy(pair, p, len);
+        pair[len] = '\0';
+
+        // Split key and value by comma
+        char *comma = strchr(pair, ',');
+        if (!comma) break;
+
+        *comma = '\0';
+        strncpy(key, pair, sizeof(key));
+        strncpy(value, comma + 1, sizeof(value));
+
+        // Assign to struct
+        if (strcmp(key, "open") == 0)
+            data->open = atoi(value);
+        else if (strcmp(key, "locked") == 0)
+            data->locked = atoi(value);
+        else if (strcmp(key, "motion") == 0)
+            data->motion_detected = atoi(value);
+        else if (strcmp(key, "face") == 0)
+            data->face_validated = atoi(value);
+        else if (strcmp(key, "pin") == 0)
+            data->pin_validated = atoi(value);
+        else if (strcmp(key, "attempt") == 0)
+            data->new_attempt = atoi(value);
+        else if (strcmp(key, "face_name") == 0)
+            strncpy(data->face_name, value, sizeof(data->face_name) - 1);
+        else if (strcmp(key, "temp") == 0)
+            strncpy(data->temperature, value, sizeof(data->temperature) - 1);
+        else if (strcmp(key, "humidity") == 0)
+            strncpy(data->humidity, value, sizeof(data->humidity) - 1);
+        else if (strcmp(key, "air") == 0)
+            strncpy(data->air_quality, value, sizeof(data->air_quality) - 1);
+
+        p = end + 1;  // continue after ']'
+    }
+}
+
+void send_mqtt_data(char *input) {
+    // if (!data) {
+    //     // handle allocation failure
+    //     return;
+    // }
+	mqtt_lvgl_data_t *data = k_malloc(sizeof(mqtt_lvgl_data_t));
+	if (!data) {
+		LOG_ERR("Failed to allocate memory for MQTT LVGL data");
+		return;
+	}
+	parse_bracketed_pairs(input, data);
+
+    k_fifo_put(&mqtt_lvgl_fifo, data);
+}
 
 /**
  * Prepare the file descriptor list for polling.
@@ -86,9 +158,11 @@ static void mqtt_evt_handler(struct mqtt_client *const c, const struct mqtt_evt 
             	printk("ERROR: Failed to read publish payload [%d]\n", rc);
             	break;
         	}
-
+			
         	buf[MIN(p->message.payload.len, sizeof(buf) - 1)] = '\0';
         	printk("Payload: %s\n", buf);
+			send_mqtt_data(buf);  // Process the payload data
+
     	} else {
         	printk("Payload length is zero.\n");
     	}
@@ -344,9 +418,13 @@ int start_mqtt_client(void) {
 		if (rc != 0) {
 			break;
 		}
+		k_msleep(100);  // Adjust as needed for your application
+
 		// how to publish...
 	}
 	mqtt_disconnect(&client);
+
+	return 0;
 }
 
 
