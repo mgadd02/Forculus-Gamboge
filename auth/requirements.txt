@@ -6,3 +6,5 @@ Pillow
 scikit-learn
 pyserial
 matplotlib
+paho-mqtt
+web3
