@@ -21,7 +21,7 @@ CAM_HOST     = "192.168.92.137"
 STREAM_URL   = f"http://{CAM_HOST}:81/stream"
 FRAME_WIDTH  = 640
 FRAME_HEIGHT = 480
-THRESHOLD    = 0.85
+THRESHOLD    = 0.75
 
 # -----------------------------------------------------------------------------
 # Supported camera resolutions
