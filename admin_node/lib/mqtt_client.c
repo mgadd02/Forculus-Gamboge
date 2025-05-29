@@ -7,7 +7,6 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/kernel.h>
 #include <string.h>
-#include <zephyr/data/json.h>
 #include <zephyr/sys/printk.h>
 #include <stdbool.h>
 
@@ -17,10 +16,13 @@ LOG_MODULE_REGISTER(mqtt_sub, LOG_LEVEL_INF);
 
 int start_mqtt_client(void);
 
+#define RX_BUFFER_SIZE 512
+#define TX_BUFFER_SIZE 256
+
 static struct mqtt_client client;
 static struct sockaddr_storage broker;
-static uint8_t rx_buffer[256];
-static uint8_t tx_buffer[256];
+static uint8_t rx_buffer[RX_BUFFER_SIZE];
+static uint8_t tx_buffer[TX_BUFFER_SIZE];
 static struct k_sem wifi_connected;
 
 static bool mqtt_connected = false;
@@ -83,6 +85,97 @@ void parse_bracketed_pairs(const char *input, mqtt_lvgl_data_t *data) {
     }
 }
 
+void parse_bracketed_triples(const char *input, mqtt_lvgl_data_t *data) {
+    const char *p = input;
+    char key[32], value[32];
+
+    float eco2 = -1.0f;
+    float etvoc = -1.0f;
+    bool face_name_received = false;
+
+    while ((p = strchr(p, '[')) != NULL) {
+        p++;  // move past '['
+
+        const char *end = strchr(p, ']');
+        if (!end) break;
+
+        size_t len = end - p;
+        char triple[96];
+        if (len >= sizeof(triple)) len = sizeof(triple) - 1;
+        strncpy(triple, p, len);
+        triple[len] = '\0';
+
+        // Split into parts: device, key, value
+        char *device = strtok(triple, ",");
+        char *k = strtok(NULL, ",");
+        char *v = strtok(NULL, ",");
+
+        if (!device || !k) {
+            p = end + 1;
+            continue;
+        }
+
+        strncpy(key, k, sizeof(key));
+
+        // Assign default or actual value
+        if (v && *v != '\0') {
+            strncpy(value, v, sizeof(value));
+        // } else if (strcmp(key, "person") == 0) {
+
+            // strncpy(value, "unknown", sizeof(value));
+        } else {
+            p = end + 1;
+            continue;
+        }
+
+        // Only handle fields in mqtt_lvgl_data_t
+        if (strcmp(key, "door_state") == 0) {
+            data->locked = strcmp(value, "locked") == 0;
+            data->open = !data->locked;
+            data->pin_validated = !data->locked;
+        } else if (strcmp(key, "person_present") == 0) {
+            data->motion_detected = (strcmp(value, "1") == 0);
+        } else if (strcmp(key, "attempt") == 0) {
+            data->new_attempt = atoi(value);
+        } else if (strcmp(key, "person") == 0) {
+            strncpy(data->face_name, value, sizeof(data->face_name) - 1);
+            data->face_name[sizeof(data->face_name) - 1] = '\0';
+            face_name_received = true;
+        } else if (strcmp(key, "Temp") == 0) {
+            strncpy(data->temperature, value, sizeof(data->temperature) - 1);
+            data->temperature[sizeof(data->temperature) - 1] = '\0';
+		} else if (strcmp(key, "Hum") == 0) {
+            strncpy(data->humidity, value, sizeof(data->humidity) - 1);
+            data->humidity[sizeof(data->humidity) - 1] = '\0';
+        } else if (strcmp(key, "eCO2") == 0) {
+            eco2 = atof(value);
+        } else if (strcmp(key, "eTVOC") == 0) {
+            etvoc = atof(value);
+        }
+
+        p = end + 1;
+    }
+
+    // Set face validation status
+    if (face_name_received && strcmp(data->face_name, "Unknown") != 0) {
+        data->face_validated = true;
+    } else {
+        data->face_validated = false;
+    }
+
+    // Determine air quality from eCO2 and eTVOC
+    if (eco2 > 0 && etvoc > 0) {
+        if (eco2 < 800 && etvoc < 100)
+            strncpy(data->air_quality, "Good", sizeof(data->air_quality));
+        else if (eco2 < 1200 && etvoc < 300)
+            strncpy(data->air_quality, "Moderate", sizeof(data->air_quality));
+        else
+            strncpy(data->air_quality, "Poor", sizeof(data->air_quality));
+    } else {
+        strncpy(data->air_quality, "Unknown", sizeof(data->air_quality));
+    }
+}
+
 void send_mqtt_data(char *input) {
     // if (!data) {
     //     // handle allocation failure
@@ -93,9 +186,14 @@ void send_mqtt_data(char *input) {
 		LOG_ERR("Failed to allocate memory for MQTT LVGL data");
 		return;
 	}
-	parse_bracketed_pairs(input, data);
+	printk("HEREA");
+	parse_bracketed_triples(input, data);
+	printk("HEREB");
+
 
     k_fifo_put(&mqtt_lvgl_fifo, data);
+	printk("HEREC");
+
 }
 
 /**
@@ -146,7 +244,7 @@ static void mqtt_evt_handler(struct mqtt_client *const c, const struct mqtt_evt 
 
 	case MQTT_EVT_PUBLISH: {
 	    const struct mqtt_publish_param *p = &evt->param.publish;
-    	char buf[128];
+    	char buf[RX_BUFFER_SIZE];
 
     	printk("MQTT_EVT_PUBLISH received\n");
     	printk("Topic: %.*s\n", p->message.topic.topic.size, p->message.topic.topic.utf8);
@@ -160,7 +258,8 @@ static void mqtt_evt_handler(struct mqtt_client *const c, const struct mqtt_evt 
         	}
 			
         	buf[MIN(p->message.payload.len, sizeof(buf) - 1)] = '\0';
-        	printk("Payload: %s\n", buf);
+        	// printk("Payload: %s\n", buf);
+			printk("NEW PAYLOAD");
 			send_mqtt_data(buf);  // Process the payload data
 
     	} else {
@@ -355,6 +454,12 @@ int app_mqtt_process(void)
 		if (fds[0].revents & ZSOCK_POLLIN) {
 			/* MQTT data received */
 			rc = mqtt_input(&client);
+
+			if (mqtt_input(&client) == -EBUSY) {
+    			LOG_WRN("MQTT client busy, skipping input");
+    			return 0;  // Avoid treating it as fatal
+			}	
+
 			if (rc != 0) {
 				LOG_ERR("MQTT Input failed [%d]", rc);
 				return rc;
